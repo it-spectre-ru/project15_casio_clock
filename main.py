@@ -1,7 +1,10 @@
+import json
 import time
 import os
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
+
 
 def get_all_pages():
 	headers = {
@@ -36,8 +39,43 @@ def get_all_pages():
 
 
 
+def collect_data(pages_count):
+	cur_date = datetime.now().strftime("%d_%m_%Y")
+	
+	data = []
+	for page in range(1, pages_count):
+		with open(f'data/page_{page}.html') as file:
+			src = file.read()
+
+		soup = BeautifulSoup(src, 'lxml')
+		items_cards = soup.find_all('a', class_='product-item__link')
+
+		for item in items_cards:
+			product_article = item.find('p', class_='product-item__articul').text.strip()
+			product_price = item.find('p', class_='product-item__price').text
+			product_url = f'https://shop.casio.ru{item.get("href")}'
+
+			#print(f'Article: {product_article} - Price: {product_price} - URL: {product_url}')
+
+			data.append(
+				{
+					"product_article": product_article,
+					"product_url": product_url,
+					"product_price": product_price
+				}
+			)
+
+		print(f"[INFO] {page}")
+
+	with open(f'data_{cur_date}.json', 'a') as file:
+		json.dump(data, file, indent=4, ensure_ascii=False)
+
+
+
+
 def main():
 	pages_count = get_all_pages()
+	collect_data(pages_count=pages_count)
 
 if __name__ == '__main__':
 	main()
