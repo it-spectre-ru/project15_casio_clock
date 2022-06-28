@@ -1,3 +1,4 @@
+import time
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -23,12 +24,20 @@ def get_all_pages():
 	
 	for i in range(1, pages_count + 1):
 		url = f'https://shop.casio.ru/catalog/g-shock/filter/gender-is-male/apply/?PAGEN_1={i}'
-		print(url)
+		
+		r = requests.get(url=url, headers=headers)
+
+		with open(f'data/page_{i}.html', 'w') as file:
+			file.write(r.text)
+
+		time.sleep(2)
+	
+	return pages_count + 1
 
 
 
 def main():
-	get_all_pages()
+	pages_count = get_all_pages()
 
 if __name__ == '__main__':
 	main()
