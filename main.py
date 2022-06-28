@@ -1,3 +1,4 @@
+import csv
 import json
 import time
 import os
@@ -41,7 +42,18 @@ def get_all_pages():
 
 def collect_data(pages_count):
 	cur_date = datetime.now().strftime("%d_%m_%Y")
-	
+
+	with open(f'data_{cur_date}.csv', 'w') as file:
+		writer = csv.writer(file)
+
+		writer.writerow(
+			(
+				"Артикул",
+				"Ссылка",
+				"Цена"
+			)
+		)
+
 	data = []
 	for page in range(1, pages_count):
 		with open(f'data/page_{page}.html') as file:
@@ -63,6 +75,17 @@ def collect_data(pages_count):
 					"product_url": product_url,
 					"product_price": product_price
 				}
+			)
+
+			with open(f'data_{cur_date}.csv', 'a') as file:
+				writer = csv.writer(file)
+
+			writer.writerow(
+				(
+					product_article,
+					product_url,
+					product_price
+				)
 			)
 
 		print(f"[INFO] {page}")
